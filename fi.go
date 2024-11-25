@@ -94,14 +94,14 @@ func printFOSInfo(bytecode []byte) {
 		fmt.Printf("Plugins [%03d]: %s\n", i, string(plugin))
 	}
 
-	// var lightPluginCount uint16
-	// binary.Read(reader, binary.LittleEndian, &lightPluginCount)
-	// for i := 0; i < int(lightPluginCount); i++ {
-	// 	binary.Read(reader, binary.LittleEndian, &u16)
-	// 	plugin := make([]byte, u16)
-	// 	binary.Read(reader, binary.LittleEndian, &plugin)
-	// 	fmt.Printf("Light Plugins [%05d]: %s\n", i, string(plugin))
-	// }
+	var lightPluginCount uint16
+	binary.Read(reader, binary.LittleEndian, &lightPluginCount)
+	for i := 0; i < int(lightPluginCount); i++ {
+		binary.Read(reader, binary.LittleEndian, &u16)
+		plugin := make([]byte, u16)
+		binary.Read(reader, binary.LittleEndian, &plugin)
+		fmt.Printf("Light Plugins [%05d]: %s\n", i, string(plugin))
+	}
 }
 
 func main() {
