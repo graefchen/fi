@@ -24,7 +24,6 @@ func toTime(t [8]byte) time.Time {
 }
 
 func printFOSInfo(bytecode []byte) {
-	var u8 uint8
 	var u16 uint16
 	var u32 uint32
 	var f32 float32
@@ -75,8 +74,10 @@ func printFOSInfo(bytecode []byte) {
 	binary.Read(reader, binary.LittleEndian, &snapshotHeight)
 	snapshot := make([]uint8, snapshotWidth*snapshotHeight*4)
 	binary.Read(reader, binary.LittleEndian, &snapshot)
-	binary.Read(reader, binary.LittleEndian, &u8)
-	fmt.Println("Format Version:", u8)
+
+	var version uint8
+	binary.Read(reader, binary.LittleEndian, &version)
+	fmt.Println("Format Version:", version)
 
 	binary.Read(reader, binary.LittleEndian, &u16)
 	gameVersion := make([]byte, u16)
@@ -94,13 +95,17 @@ func printFOSInfo(bytecode []byte) {
 		fmt.Printf("Plugins [%03d]: %s\n", i, string(plugin))
 	}
 
-	var lightPluginCount uint16
-	binary.Read(reader, binary.LittleEndian, &lightPluginCount)
-	for i := 0; i < int(lightPluginCount); i++ {
-		binary.Read(reader, binary.LittleEndian, &u16)
-		plugin := make([]byte, u16)
-		binary.Read(reader, binary.LittleEndian, &plugin)
-		fmt.Printf("Light Plugins [%05d]: %s\n", i, string(plugin))
+	// The pre Creation Club update version is version 67 and seems to
+	// not have the light plugin data structure in its savefile
+	if version == 68 {
+		var lightPluginCount uint16
+		binary.Read(reader, binary.LittleEndian, &lightPluginCount)
+		for i := 0; i < int(lightPluginCount); i++ {
+			binary.Read(reader, binary.LittleEndian, &u16)
+			plugin := make([]byte, u16)
+			binary.Read(reader, binary.LittleEndian, &plugin)
+			fmt.Printf("Light Plugins [%05d]: %s\n", i, string(plugin))
+		}
 	}
 }
 
